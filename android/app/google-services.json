@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "687616497073",
+    "project_id": "campmeet-5094b",
+    "storage_bucket": "campmeet-5094b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:687616497073:android:b1b98937293e35be191990",
+        "android_client_info": {
+          "package_name": "com.campmeet.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCuSpvjxYX0_rZ_MuyfjibIk3X-VrTHX-Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

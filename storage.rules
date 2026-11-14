@@ -1,0 +1,55 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Gültiges Upload: Bild, max. 5 MB
+    function validImage() {
+      return request.resource.size <= 5242880 &&
+             request.resource.contentType.matches('image/.*');
+    }
+
+    // User avatars - public read, authenticated write to own folder
+    match /avatars/{userId}/{allPaths=**} {
+      allow read: if true; // Public avatars
+      allow create, update: if request.auth != null && request.auth.uid == userId && validImage();
+      allow delete: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Profile images - public read, authenticated write to own folder
+    match /profiles/{userId}/{allPaths=**} {
+      allow read: if true; // Public profile images
+      allow create, update: if request.auth != null && request.auth.uid == userId && validImage();
+      allow delete: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Student ID verification uploads - authenticated write, admin read
+    match /verifications/{userId}/{allPaths=**} {
+      // Users can upload to their own verification folder
+      allow create, update: if request.auth != null && request.auth.uid == userId && validImage();
+
+      // Users can read their own uploads
+      allow read: if request.auth != null && request.auth.uid == userId;
+
+      // Admins can read all verification uploads for review
+      allow read: if request.auth != null &&
+                     firestore.get(/databases/(default)/documents/admin/config).data.admins[request.auth.uid] == true;
+
+      // Only admins can delete
+      allow delete: if request.auth != null &&
+                       firestore.get(/databases/(default)/documents/admin/config).data.admins[request.auth.uid] == true;
+    }
+
+    // WG-Anzeigenbilder - öffentlich lesbar, nur Besitzer schreibt
+    match /wg/{userId}/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow create, update: if request.auth != null && request.auth.uid == userId && validImage();
+      allow delete: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Chat media - users can upload, senders can read
+    match /chats/{userId}/{allPaths=**} {
+      allow create, update: if request.auth != null && request.auth.uid == userId && validImage();
+      allow read: if request.auth != null;
+      allow delete: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
